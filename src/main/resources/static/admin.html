@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Seating Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+    <STYLE>
+        /* General Layout Styles */
+#layout {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.section-header h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Layout Filters */
+.layout-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  align-items: flex-end;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.primary-btn {
+  padding: 8px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Layout Container */
+.layout-container {
+  min-height: 400px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+}
+
+.layout-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.layout-header h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.layout-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Grid Seating Layout */
+.seating-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.seat {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.desk {
+  position: absolute;
+  width: 80px;
+  height: 50px;
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  top: 15px;
+  left: 10px;
+  z-index: 1;
+}
+
+.chair {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: #9e9e9e;
+  border-radius: 5px;
+  bottom: 5px;
+  left: 30px;
+  z-index: 2;
+}
+
+.seat-label {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #444;
+  z-index: 3;
+}
+
+/* Open Space Seating */
+.open-space-seating {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.seat.open-space {
+  border: 1px dashed #ccc;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+/* Conference Room Seating */
+.conference-seating {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+.conference-table {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 40%;
+  background-color: #d2b48c;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.chair.conference {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: #9e9e9e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Round Table Seating */
+.round-table-seating {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+.round-table {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background-color: #d2b48c;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.chair.round-table {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: #9e9e9e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .layout-filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .seating-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .seat {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .desk {
+    width: 60px;
+    height: 40px;
+    top: 10px;
+    left: 10px;
+  }
+  
+  .chair {
+    width: 30px;
+    height: 30px;
+    bottom: 5px;
+    left: 25px;
+  }
+}
+
+/* Hover effects */
+.seat:hover .desk {
+  background-color: #bdbdbd;
+}
+
+.seat:hover .chair {
+  background-color: #757575;
+}
+
+/* Occupied seat styling (can be added dynamically) */
+.seat.occupied .desk {
+  background-color: #bbdefb;
+}
+
+.seat.occupied .chair {
+  background-color: #1976d2;
+}
+
+/* Reserved seat styling (can be added dynamically) */
+.seat.reserved .desk {
+  background-color: #ffecb3;
+}
+
+.seat.reserved .chair {
+  background-color: #ffa000;
+}
+    </STYLE>
+
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#" data-section="students"><i class="fas fa-user-graduate"></i> Students</a></li>
+                <li><a href="#" data-section="departments"><i class="fas fa-building"></i> Departments</a></li>
+                <li><a href="#" data-section="rooms"><i class="fas fa-door-open"></i> Rooms</a></li>
+                <li><a href="#" data-section="upload"><i class="fas fa-file-upload"></i> Upload Data</a></li>
+                <li><a href="#" data-section="layout"><i class="fas fa-th"></i> Seating Layout</a></li>
+                <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+        
+        <main class="content">
+            <header class="content-header">
+                <button id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+                <h2 id="section-title">Dashboard</h2>
+                <div class="user-info">
+                    <span>Admin</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&size=40" alt="Admin Avatar">
+
+                </div>
+            </header>
+            
+            <div class="content-body">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="active-section">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                            <div class="stat-info">
+                                <h3>Total Students</h3>
+                                <p id="total-students">550</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-building"></i></div>
+                            <div class="stat-info">
+                                <h3>Departments</h3>
+                                <p id="total-departments">10</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+                            <div class="stat-info">
+                                <h3>Rooms</h3>
+                                <p id="total-rooms">24</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn" data-section="students">Manage Students</button>
+                            <button class="action-btn" data-section="upload">Upload Data</button>
+                        </div>
+                    </div>
+                </section>
+                
+                
+<section id="students" class="section-content">
+    <div class="section-header">
+      <h3>Manage Students</h3>
+      <button id="addStudentBtn" class="primary-btn"><i class="fas fa-plus"></i> Add Student</button>
+    </div>
+  
+    <div class="search-bar">
+      <input type="text" id="student-search" placeholder="Search students...">
+      <button class="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+  
+    <div class="table-container">
+      <table id="students-table">
+        <thead>
+          <tr>
+            <th>Reg No</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Seat No</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Student data will be inserted here by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Add/Edit Student Modal -->
+    <div id="student-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h3 id="student-modal-title">Add Student</h3>
+        <form id="student-form">
+          <input type="hidden" id="edit-mode" value="add">
+          <div class="form-group">
+            <label for="reg-no">Registration Number</label>
+            <input type="text" id="reg-no" required>
+          </div>
+          <div class="form-group">
+            <label for="student-name">Name</label>
+            <input type="text" id="student-name" required>
+          </div>
+          <div class="form-group">
+            <label for="student-department">Department</label>
+            <select id="student-department" required>
+              <option value="">Select</option>
+              <option value="CSE">CSE</option>
+              <option value="IT">IT</option>
+              <option value="ECE">ECE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="seat-no">Seat Number</label>
+            <input type="text" id="seat-no" required>
+          </div>
+          <button type="submit" class="primary-btn">Save</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  
+  <script src="student.js"></script>
+                  
+                 
+                <!-- Departments Section -->
+                <section id="departments">
+                    <div class="section-header">
+                        <h3>Manage Departments</h3>
+                        <button id="add-department-btn" class="primary-btn"><i class="fas fa-plus"></i> Add Department</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="departments-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Department data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Add/Edit Department Modal -->
+                    <div id="department-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h3 id="department-modal-title">Add Department</h3>
+                            <form id="department-form">
+                                <input type="hidden" id="department-edit-mode" value="add">
+                                <input type="hidden" id="department-id">
+                                <div class="form-group">
+                                    <label for="department-name">Name</label>
+                                    <input type="text" id="department-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="department-code">Code</label>
+                                    <input type="text" id="department-code" required>
+                                </div>
+                                <button type="submit" class="primary-btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                <script src="departments.js"></script>
+                
+                <!-- Rooms Section -->
+                <section id="rooms">
+                    <div class="section-header">
+                        <h3>Manage Rooms</h3>
+                        <button id="add-room-btn" class="primary-btn"><i class="fas fa-plus"></i> Add Room</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="rooms-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Room Number</th>
+                                    <th>Building</th>
+                                    <th>Department</th>
+                                    <th>Capacity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Room data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Add/Edit Room Modal -->
+                    <div id="room-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h3 id="room-modal-title">Add Room</h3>
+                            <form id="room-form">
+                                <input type="hidden" id="room-edit-mode" value="add">
+                                <input type="hidden" id="room-id">
+                                <div class="form-group">
+                                    <label for="room-number">Room Number</label>
+                                    <input type="text" id="room-number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="room-building">Building</label>
+                                    <input type="text" id="room-building" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="room-department">Department</label>
+                                    <select id="room-department" required>
+                                        <!-- Will be populated from API -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="room-capacity">Capacity</label>
+                                    <input type="number" id="room-capacity" min="1" required>
+                                </div>
+                                <button type="submit" class="primary-btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                <script src="room.js"></script>
+                
+                <!-- Upload Section -->
+                <section id="upload">
+                    <div class="section-header">
+                        <h3>Upload Student Data</h3>
+                    </div>
+                    
+                    <div class="upload-container">
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <h4>Upload CSV File</h4>
+                            <p>Upload student data from a CSV file</p>
+                            <form id="csv-upload-form">
+                                <input type="file" id="csv-file" accept=".csv" required>
+                                <button type="submit" class="primary-btn">Upload</button>
+                            </form>
+                        </div>
+                        
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <h4>Upload Excel File</h4>
+                            <p>Upload student data from an Excel file</p>
+                            <form id="excel-upload-form">
+                                <input type="file" id="excel-file" accept=".xlsx" required>
+                                <button type="submit" class="primary-btn">Upload</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="template-section">
+                        <h4>Download Templates</h4>
+                        <p>Download template files for uploading data</p>
+                        <div class="template-buttons">
+                            <a href="/templates/student-template.csv" class="secondary-btn"><i class="fas fa-download"></i> CSV Template</a>
+                            <a href="/templates/student-template.xlsx" class="secondary-btn"><i class="fas fa-download"></i> Excel Template</a>
+                        </div>
+                    </div>
+                </section>
+                <script src="js/upload.js"></script>
+
+               
+                
+                <!-- Seating Layout Section -->
+                <section id="layout">
+                    <div class="section-header">
+                        <h3>Seating Layout</h3>
+                    </div>
+                    
+                    <div class="layout-filters">
+                        <div class="form-group">
+                            <label for="layout-department">Department</label>
+                            <select id="layout-department">
+                                <option value="">Select Department</option>
+                                <!-- Will be populated from API -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="layout-room">Room</label>
+                            <select id="layout-room">
+                                <option value="">Select Room</option>
+                                <!-- Will be populated based on department selection -->
+                            </select>
+                        </div>
+                        <button id="view-layout" class="primary-btn">View Layout</button>
+                    </div>
+                    
+                    <div class="layout-container">
+                        <div id="room-layout">
+                            <!-- Room layout will be generated here -->
+                            <p class="empty-state">Select a department and room to view the seating layout</p>
+                        </div>
+                    </div>
+                </section>
+                <script src="layout.js"></script>
+            </div>
+        </main>
+    </div>
+    
+    <script src="admin.js"></script>
+    
+</body>
+</html>

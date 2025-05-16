@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seat Details</title>
+    <style>
+        body {
+    background-color: #f9f9ff;
+    color: #333333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.result-box {
+    background-color: #f9f9f9;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+}
+
+h3 {
+    color: #3b2be2;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+p {
+    margin: 12px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+strong {
+    color: #111;
+}
+
+.back-btn {
+    margin-top: 25px;
+    padding: 12px 24px;
+    background-color: #3b2be2;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #2a1ed3;
+    color: #fff;
+}
+
+    </style>
+</head>
+<body>
+    <div class="result-box">
+        <h3>Seat Details</h3>
+        <p><strong>Registration Number:</strong> <span id="regNumber"></span></p>
+        <p><strong>Seat Number:</strong> <span id="seatNumber"></span></p>
+        <p><strong>Room Number:</strong> <span id="roomNumber"></span></p>
+        <p><strong>location:</strong> <span id="location"></span></p>
+        <button class="back-btn" onclick="goBack()">Check Another</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Loading seat details..."); // Debugging step
+    
+            document.getElementById("regNumber").textContent = localStorage.getItem("regNumber") || "Not found";
+            document.getElementById("seatNumber").textContent = localStorage.getItem("seatNumber") || "Not found";
+            document.getElementById("roomNumber").textContent = localStorage.getItem("roomNumber") || "Not found";
+            document.getElementById("location").textContent = localStorage.getItem("location") || "Not found";
+        });
+    
+        function goBack() {
+            window.location.href = "index.html";
+        }
+    </script>
+  
+</body>
+</html>

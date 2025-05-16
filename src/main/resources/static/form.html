@@ -1,0 +1,183 @@
+<!-- src/main/resources/templates/registrationForm.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="text-center text-white card-header bg-primary">
+                <h2>SGGS Institute of Engineering and Technology</h2>
+                <h4>Student Registration for Second Term Examination</h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/register}" method="post" th:object="${student}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name:</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="className" class="form-label">Class:</label>
+                        <select class="form-control" id="className" th:field="*{className}" required>
+                            <option value="">Select Class</option>
+                            <option value="First Year B. Tech. Computer Science and Engineering">First Year B. Tech. CSE</option>
+                            <option value="Second Year B. Tech. Computer Science and Engineering">Second Year B. Tech. CSE</option>
+                            <option value="Third Year B. Tech. Computer Science and Engineering">Third Year B. Tech. CSE</option>
+                            <option value="Final Year B. Tech. Computer Science and Engineering">Final Year B. Tech. CSE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="registrationNumber" class="form-label">Registration Number:</label>
+                        <input type="text" class="form-control" id="registrationNumber" th:field="*{registrationNumber}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Select Subjects:</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Subject Code</th>
+                                        <th>Subject Name</th>
+                                        <th>Theory</th>
+                                        <th>Practical</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="subject : ${subjects}">
+                                        <td>
+                                            <input type="checkbox" th:name="subjectCodes" th:value="${subject.code}" class="form-check-input">
+                                        </td>
+                                        <td th:text="${subject.code}"></td>
+                                        <td th:text="${subject.name}"></td>
+                                        <td class="text-center">
+                                            <span th:if="${subject.theory}">TH</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span th:if="${subject.practical}">PR</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Register & Generate Admit Card</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
+
+<!-- src/main/resources/templates/admitCard.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admit Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card" id="admitCard">
+            <div class="card-header bg-light">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img th:src="@{/images/logo.png}" alt="Institute Logo" class="img-fluid" style="max-height: 80px;">
+                    </div>
+                    <div class="text-center col-md-8">
+                        <h3>SGGS Institute of Engineering and Technology</h3>
+                        <h5>Vishnupuri, Nanded - 431 606</h5>
+                        <p class="mb-0"><em>Admit Card for Second Term Examination 2024-25</em></p>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="border photo-box" style="width: 120px; height: 150px; display: flex; align-items: center; justify-content: center;">
+                            <p class="text-center text-muted">Student<br>Photo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> <span th:text="${student.name}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Registration No:</strong> <span th:text="${student.registrationNumber}"></span></p>
+                    </div>
+                </div>
+                
+                <div class="mb-3 row">
+                    <div class="col-md-8">
+                        <p><strong>Class:</strong> <span th:text="${student.className}"></span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Status:</strong> <span th:text="${student.status}"></span></p>
+                    </div>
+                </div>
+                
+                <p><strong>In the subjects mentioned hereunder:</strong></p>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Name</th>
+                                <th>TH</th>
+                                <th>PR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="subject : ${student.subjects}">
+                                <td th:text="${subject.code}"></td>
+                                <td th:text="${subject.name}"></td>
+                                <td class="text-center">
+                                    <span th:if="${subject.theory}">✓</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${subject.practical}">✓</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-5 row">
+                    <div class="col-md-4">
+                        <p class="mb-5">Candidate's Signature</p>
+                    </div>
+                    <div class="col-md-8 text-end">
+                        <p>(Dr. P. W. Deshmukh)<br>Controller of Examinations</p>
+                    </div>
+                </div>
+                
+                <p class="small text-muted"><em>Note: Please ensure registered courses are correct and if any correction, contact Examination section immediately.</em></p>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a th:href="@{/download(regNumber=${student.registrationNumber})}" class="btn btn-success" target="_blank">Download PDF</a>
+            <a th:href="@{/}" class="btn btn-secondary ms-2">Back to Registration</a>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

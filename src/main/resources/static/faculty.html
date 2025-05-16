@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplified Faculty Exam Portal</title>
+    <link rel="stylesheet" href="faculty.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Faculty Exam Management Portal</div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userInitials">JP</div>
+                    <div>
+                        <div id="userName">Dr. John Peterson</div>
+                        <div id="userDepartment" style="font-size: 12px;">Computer Science Department</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="faculty-selector">
+            <label for="facultySelect"><strong>Select Faculty:</strong></label>
+            <select id="facultySelect">
+                <option value="jp">Dr. kulkarni Prashant</option>
+                <option value="sj">Prof. Sarah Johnson</option>
+                <option value="rl">Dr. Meheta</option>
+                <option value="am">Dr. Amey Mehta</option>
+                <option value="db">Prof. deshmukh B</option>
+            </select>
+            <button class="button" style="margin-left: 10px;" id="addFacultyBtn">Add New Faculty</button>
+        </div>
+        
+        <div class="content-section">
+            <div class="section-title">Your Room Allocations</div>
+            
+            <div id="roomAllocations">
+                <!-- Room allocation cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Student List Modal -->
+    <div id="studentListModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Student List</div>
+                <span class="close-modal" id="closeStudentListModal">&times;</span>
+            </div>
+            <div id="studentListContent">
+                <!-- Student list will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="button secondary" id="closeStudentListBtn">Close</button>
+                <button class="button success" id="downloadAttendanceBtn">Download Attendance PDF</button>
+                <button class="button" id="markAttendanceBtn">Mark Attendance</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance Modal -->
+    <div id="attendanceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Mark Attendance</div>
+                <span class="close-modal" id="closeAttendanceModal">&times;</span>
+            </div>
+            <div id="attendanceContent">
+                <!-- Attendance form will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="button secondary" id="closeAttendanceBtn">Close</button>
+                <button class="button success" id="saveAttendanceBtn">Save Attendance</button>
+                <button class="button" id="downloadAttendanceBtn2">Download Attendance PDF</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Faculty Modal -->
+    <div id="addFacultyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add New Faculty</div>
+                <span class="close-modal" id="closeAddFacultyModal">&times;</span>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label for="newFacultyName">Full Name:</label>
+                    <input type="text" id="newFacultyName" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label for="newFacultyTitle">Title:</label>
+                    <select id="newFacultyTitle">
+                        <option value="Dr.">Dr.</option>
+                        <option value="Prof.">Prof.</option>
+                        <option value="Mr.">Mr.</option>
+                        <option value="Ms.">Ms.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newFacultyDept">Department:</label>
+                    <input type="text" id="newFacultyDept" placeholder="Enter department">
+                </div>
+                <div class="form-group">
+                    <label for="newFacultyEmail">Email:</label>
+                    <input type="email" id="newFacultyEmail" placeholder="Enter email address">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button secondary" id="cancelAddFacultyBtn">Cancel</button>
+                <button class="button success" id="addFacultySubmitBtn">Add Faculty</button>
+            </div>
+        </div>
+    </div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Faculty Exam Management Portal</div>
+                <div class="user-info">
+                  
+
+                    </div>
+                    <button class="button logout-button" id="logoutBtn" title="Logout">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    
+    <script src="faculty.js"></script>
+</body>
+</html>

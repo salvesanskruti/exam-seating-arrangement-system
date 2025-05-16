@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .dashboard-container {
+      background-color: #f9fafb;
+      min-height: 100vh;
+    }
+    .header-gradient {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    }
+    .room-card {
+      transition: all 0.3s ease;
+    }
+    .room-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      transform: translateY(-2px);
+    }
+    .student-table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .student-table th {
+      background-color: #4f46e5;
+      color: white;
+      font-weight: 600;
+      padding: 12px;
+    }
+    .student-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .student-table tr:nth-child(even) {
+      background-color: #f3f4f6;
+    }
+    .student-table tr:hover {
+      background-color: #eff6ff;
+    }
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="dashboard-container">
+  <!-- Header -->
+  <header class="p-4 text-white shadow-lg header-gradient">
+    <div class="container flex flex-col items-center justify-between mx-auto md:flex-row">
+      <div class="flex items-center mb-4 md:mb-0">
+        <i class="mr-3 text-3xl fas fa-chalkboard-teacher"></i>
+        <h1 class="text-2xl font-bold">Faculty Dashboard</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="facultyName" 
+            placeholder="Enter Faculty Name" 
+            class="px-4 py-2 pr-10 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+          <i class="absolute text-gray-400 fas fa-search right-3 top-3"></i>
+        </div>
+        <button 
+          onclick="loadDashboard()" 
+          class="flex items-center px-4 py-2 text-white rounded-lg shadow btn-primary hover:shadow-lg"
+        >
+          <i class="mr-2 fas fa-door-open"></i>
+          View Assigned Rooms
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container p-4 mx-auto">
+    <!-- Dashboard Status -->
+    <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-700">Room Assignment Status</h2>
+        <div class="text-sm text-gray-500">
+          <span id="currentDate"></span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <p class="text-gray-600" id="statusMessage">Enter faculty name and click "View Assigned Rooms" to load your dashboard.</p>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loader" class="loader"></div>
+
+    <!-- Room Information Cards -->
+    <div id="roomInfo" class="grid grid-cols-1 gap-6 fade-in"></div>
+    
+    <!-- Download Section -->
+    <div id="downloadSection" class="flex flex-col items-center justify-between p-6 mt-8 bg-white rounded-lg shadow-md md:flex-row" style="display: none;">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700">Download Attendance Sheets</h3>
+        <p class="text-gray-600">Get a printable PDF version of all your assigned rooms and students.</p>
+      </div>
+      <button 
+        onclick="downloadPDF()" 
+        class="flex items-center px-6 py-3 mt-4 text-white rounded-lg shadow btn-primary hover:shadow-lg md:mt-0"
+      >
+        <i class="mr-2 fas fa-file-pdf"></i>
+        Download Attendance Sheet PDF
+      </button>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    let dashboardData = [];
+    
+    // Display current date
+    function updateDate() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+    
+    function loadDashboard() {
+      const name = document.getElementById("facultyName").value;
+      if (!name.trim()) {
+        document.getElementById("statusMessage").textContent = "Please enter a faculty name.";
+        document.getElementById("statusMessage").classList.add("text-red-500");
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("roomInfo").innerHTML = "";
+      document.getElementById("downloadSection").style.display = "none";
+      document.getElementById("statusMessage").textContent = "Loading room assignments...";
+      document.getElementById("statusMessage").classList.remove("text-red-500");
+      
+      // Fetch data
+      fetch(`/faculty/dashboard?name=${encodeURIComponent(name)}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          // Hide loading indicator
+          document.getElementById("loader").style.display = "none";
+          
+          dashboardData = data;
+          const container = document.getElementById("roomInfo");
+          container.innerHTML = "";
+          
+          if (data.length === 0) {
+            document.getElementById("statusMessage").textContent = "No rooms assigned to this faculty member.";
+            return;
+          }
+          
+          document.getElementById("statusMessage").textContent = `${data.length} room(s) assigned to ${name}`;
+          document.getElementById("downloadSection").style.display = "flex";
+          
+          data.forEach(room => {
+            const roomCard = document.createElement("div");
+            roomCard.className = "room-card bg-white rounded-lg shadow-md overflow-hidden";
+            
+            const cardHeader = document.createElement("div");
+            cardHeader.className = "header-gradient text-white p-4";
+            cardHeader.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <i class="mr-2 fas fa-door-closed"></i>
+                  <h3 class="text-xl font-semibold">Room: ${room.roomNumber}</h3>
+                </div>
+                <span class="px-3 py-1 text-sm font-medium text-indigo-600 bg-white rounded-full">
+                  ${room.building}
+                </span>
+              </div>
+            `;
+            
+            const cardBody = document.createElement("div");
+            cardBody.className = "p-4";
+            cardBody.innerHTML = `
+              <div class="flex items-center mb-4">
+                <div class="p-2 mr-3 bg-indigo-100 rounded-full">
+                  <i class="text-indigo-600 fas fa-users"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Student Capacity</p>
+                  <p class="text-lg font-semibold">${room.studentCapacity}</p>
+                </div>
+                <div class="ml-auto">
+                  <span class="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">
+                    ${room.students.length} Assigned
+                  </span>
+                </div>
+              </div>
+              
+              <div class="overflow-x-auto">
+                <table class="w-full student-table">
+                  <thead>
+                    <tr>
+                      <th class="text-left">Reg No</th>
+                      <th class="text-left">Student Name</th>
+                      <th class="text-left">Seat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${room.students.map(s => `
+                      <tr>
+                        <td>${s.registrationNumber}</td>
+                        <td>${s.studentName}</td>
+                        <td>${s.seatNumber}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `;
+            
+            roomCard.appendChild(cardHeader);
+            roomCard.appendChild(cardBody);
+            container.appendChild(roomCard);
+          });
+        })
+        .catch(error => {
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("statusMessage").textContent = "Error loading data. Please try again.";
+          document.getElementById("statusMessage").classList.add("text-red-500");
+          console.error('Error:', error);
+        });
+    }
+    
+    function downloadPDF() {
+      if (dashboardData.length === 0) {
+        alert("No data to download. Please load your dashboard first.");
+        return;
+      }
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Add title
+      const facultyName = document.getElementById("facultyName").value;
+      doc.setFontSize(16);
+      doc.setTextColor(79, 70, 229); // Indigo color
+      doc.text(`Faculty Room Assignments: ${facultyName}`, 14, 15);
+      
+      // Add date
+      const now = new Date();
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated on: ${now.toLocaleDateString()}`, 14, 22);
+      
+      let y = 30;
+      
+      dashboardData.forEach((room, index) => {
+        // Add page if needed
+        if (y > 250 && index < dashboardData.length - 1) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        // Room header
+        doc.setFillColor(79, 70, 229);
+        doc.rect(14, y, 182, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.text(`Room: ${room.roomNumber} (${room.building})`, 18, y + 7);
+        
+        y += 15;
+        
+        // Room info
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(`Capacity: ${room.studentCapacity} | Students Assigned: ${room.students.length}`, 14, y);
+        
+        y += 8;
+        
+        // Student table
+        doc.autoTable({
+          startY: y,
+          margin: { left: 14 },
+          head: [['Registration Number', 'Student Name', 'Seat Number']],
+          body: room.students.map(s => [s.registrationNumber, s.studentName, s.seatNumber]),
+          theme: 'grid',
+          headStyles: {
+            fillColor: [79, 70, 229],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: {
+            fillColor: [240, 242, 248]
+          },
+          styles: {
+            fontSize: 9
+          }
+        });
+        
+        y = doc.lastAutoTable.finalY + 15;
+      });
+      
+      doc.save("attendance-sheet.pdf");
+    }
+    
+    // Initialize date on load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateDate();
+    });
+    
+    // Allow Enter key to submit
+    document.getElementById('facultyName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        loadDashboard();
+      }
+    });
+  </script>
+</body>
+</html>

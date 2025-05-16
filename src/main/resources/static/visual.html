@@ -1,0 +1,4200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Seating Arrangement</title>
+    <style>
+      body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+h1 {
+    color: #1a3a5f;
+    margin-bottom: 25px;
+    font-size: 28px;
+    border-bottom: 2px solid #eaeaea;
+    padding-bottom: 15px;
+}
+
+h2 {
+    color: #2c5282;
+    margin-top: 30px;
+    font-size: 22px;
+}
+
+.search-box {
+    margin: 30px 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+input {
+    padding: 14px 16px;
+    border: 1px solid #d1d9e6;
+    border-radius: 8px;
+    flex-grow: 1;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+}
+
+input::placeholder {
+    color: #a0aec0;
+}
+
+button {
+    padding: 14px 24px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #3579c6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.error {
+    color: #e53e3e;
+    margin-top: 15px;
+    font-size: 14px;
+    background-color: #fff5f5;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border-left: 4px solid #e53e3e;
+    display: none;
+}
+
+.error.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.result-container {
+    margin-top: 30px;
+}
+
+.student-info {
+    background-color: #ebf8ff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 5px solid #4299e1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.room-info {
+    margin-bottom: 25px;
+    background-color: #f7fafc;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #718096;
+}
+
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.seat {
+    padding: 18px 15px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.seat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.highlighted {
+    background-color: #fef9c3;
+    font-weight: bold;
+    border: 2px solid #f59e0b;
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.2);
+    transform: scale(1.05);
+    z-index: 1;
+}
+
+.result-box {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.result-box.active {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .search-box {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+    
+    .seat-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .seat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Helper classes */
+.text-bold {
+    font-weight: 600;
+}
+
+.mt-2 {
+    margin-top: 10px;
+}
+
+.mb-2 {
+    margin-bottom: 10px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exam Seating Arrangement Finder</h1>
+        <div class="search-box">
+            <input type="text" id="regNumber" placeholder="Enter Registration Number (e.g. 2023bcs001)">
+            <button onclick="findSeating()">Find</button>
+        </div>
+        <div id="error" class="error"></div>
+        
+        <div id="resultBox" class="result-box">
+            <div id="studentInfo" class="student-info"></div>
+            <div id="roomInfo" class="room-info"></div>
+            <h2>Seat Layout</h2>
+            <div id="seatGrid" class="seat-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Student data from CSV converted to JavaScript object
+        const studentData = [
+  {
+    "regNumber": "2023bcs001",
+    "name": "Student 2023bcs001",
+    "seat": "a1",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs002",
+    "name": "Student 2023bcs002",
+    "seat": "b1",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs003",
+    "name": "Student 2023bcs003",
+    "seat": "c1",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs004",
+    "name": "Student 2023bcs004",
+    "seat": "d1",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs005",
+    "name": "Student 2023bcs005",
+    "seat": "e1",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs006",
+    "name": "Student 2023bcs006",
+    "seat": "a2",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs007",
+    "name": "Student 2023bcs007",
+    "seat": "b2",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs008",
+    "name": "Student 2023bcs008",
+    "seat": "c2",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs009",
+    "name": "Student 2023bcs009",
+    "seat": "d2",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs010",
+    "name": "Student 2023bcs010",
+    "seat": "e2",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs011",
+    "name": "Student 2023bcs011",
+    "seat": "a3",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs012",
+    "name": "Student 2023bcs012",
+    "seat": "b3",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs013",
+    "name": "Student 2023bcs013",
+    "seat": "c3",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs014",
+    "name": "Student 2023bcs014",
+    "seat": "d3",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs015",
+    "name": "Student 2023bcs015",
+    "seat": "e3",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs016",
+    "name": "Student 2023bcs016",
+    "seat": "a4",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs017",
+    "name": "Student 2023bcs017",
+    "seat": "b4",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs018",
+    "name": "Student 2023bcs018",
+    "seat": "c4",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs019",
+    "name": "Student 2023bcs019",
+    "seat": "d4",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs020",
+    "name": "Student 2023bcs020",
+    "seat": "e4",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs021",
+    "name": "Student 2023bcs021",
+    "seat": "a5",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs022",
+    "name": "Student 2023bcs022",
+    "seat": "b5",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs023",
+    "name": "Student 2023bcs023",
+    "seat": "c5",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs024",
+    "name": "Student 2023bcs024",
+    "seat": "d5",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs025",
+    "name": "Student 2023bcs025",
+    "seat": "e5",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs026",
+    "name": "Student 2023bcs026",
+    "seat": "a6",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs027",
+    "name": "Student 2023bcs027",
+    "seat": "b6",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs028",
+    "name": "Student 2023bcs028",
+    "seat": "c6",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs029",
+    "name": "Student 2023bcs029",
+    "seat": "d6",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs030",
+    "name": "Student 2023bcs030",
+    "seat": "e6",
+    "room": "CH1",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs031",
+    "name": "Student 2023bcs031",
+    "seat": "a1",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs032",
+    "name": "Student 2023bcs032",
+    "seat": "b1",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs033",
+    "name": "Student 2023bcs033",
+    "seat": "c1",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs034",
+    "name": "Student 2023bcs034",
+    "seat": "d1",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs035",
+    "name": "Student 2023bcs035",
+    "seat": "e1",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs036",
+    "name": "Student 2023bcs036",
+    "seat": "a2",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs037",
+    "name": "Student 2023bcs037",
+    "seat": "b2",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs038",
+    "name": "Student 2023bcs038",
+    "seat": "c2",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs039",
+    "name": "Student 2023bcs039",
+    "seat": "d2",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs040",
+    "name": "Student 2023bcs040",
+    "seat": "e2",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs041",
+    "name": "Student 2023bcs041",
+    "seat": "a3",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs042",
+    "name": "Student 2023bcs042",
+    "seat": "b3",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs043",
+    "name": "Student 2023bcs043",
+    "seat": "c3",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs044",
+    "name": "Student 2023bcs044",
+    "seat": "d3",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs045",
+    "name": "Student 2023bcs045",
+    "seat": "e3",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs046",
+    "name": "Student 2023bcs046",
+    "seat": "a4",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs047",
+    "name": "Student 2023bcs047",
+    "seat": "b4",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs048",
+    "name": "Student 2023bcs048",
+    "seat": "c4",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs049",
+    "name": "Student 2023bcs049",
+    "seat": "d4",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs050",
+    "name": "Student 2023bcs050",
+    "seat": "e4",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs051",
+    "name": "Student 2023bcs051",
+    "seat": "a5",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs052",
+    "name": "Student 2023bcs052",
+    "seat": "b5",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs053",
+    "name": "Student 2023bcs053",
+    "seat": "c5",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs054",
+    "name": "Student 2023bcs054",
+    "seat": "d5",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs055",
+    "name": "Student 2023bcs055",
+    "seat": "e5",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs056",
+    "name": "Student 2023bcs056",
+    "seat": "a6",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs057",
+    "name": "Student 2023bcs057",
+    "seat": "b6",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs058",
+    "name": "Student 2023bcs058",
+    "seat": "c6",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs059",
+    "name": "Student 2023bcs059",
+    "seat": "d6",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs060",
+    "name": "Student 2023bcs060",
+    "seat": "e6",
+    "room": "CH2",
+    "location": "Chemical Dept"
+  },
+  {
+    "regNumber": "2023bcs061",
+    "name": "Student 2023bcs061",
+    "seat": "a1",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs062",
+    "name": "Student 2023bcs062",
+    "seat": "b1",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs063",
+    "name": "Student 2023bcs063",
+    "seat": "c1",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs064",
+    "name": "Student 2023bcs064",
+    "seat": "d1",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs065",
+    "name": "Student 2023bcs065",
+    "seat": "e1",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs066",
+    "name": "Student 2023bcs066",
+    "seat": "a2",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs067",
+    "name": "Student 2023bcs067",
+    "seat": "b2",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs068",
+    "name": "Student 2023bcs068",
+    "seat": "c2",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs069",
+    "name": "Student 2023bcs069",
+    "seat": "d2",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs070",
+    "name": "Student 2023bcs070",
+    "seat": "e2",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs071",
+    "name": "Student 2023bcs071",
+    "seat": "a3",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs072",
+    "name": "Student 2023bcs072",
+    "seat": "b3",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs073",
+    "name": "Student 2023bcs073",
+    "seat": "c3",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs074",
+    "name": "Student 2023bcs074",
+    "seat": "d3",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs075",
+    "name": "Student 2023bcs075",
+    "seat": "e3",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs076",
+    "name": "Student 2023bcs076",
+    "seat": "a4",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs077",
+    "name": "Student 2023bcs077",
+    "seat": "b4",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs078",
+    "name": "Student 2023bcs078",
+    "seat": "c4",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs079",
+    "name": "Student 2023bcs079",
+    "seat": "d4",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs080",
+    "name": "Student 2023bcs080",
+    "seat": "e4",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs081",
+    "name": "Student 2023bcs081",
+    "seat": "a5",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs082",
+    "name": "Student 2023bcs082",
+    "seat": "b5",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs083",
+    "name": "Student 2023bcs083",
+    "seat": "c5",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs084",
+    "name": "Student 2023bcs084",
+    "seat": "d5",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs085",
+    "name": "Student 2023bcs085",
+    "seat": "e5",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs086",
+    "name": "Student 2023bcs086",
+    "seat": "a6",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs087",
+    "name": "Student 2023bcs087",
+    "seat": "b6",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs088",
+    "name": "Student 2023bcs088",
+    "seat": "c6",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs089",
+    "name": "Student 2023bcs089",
+    "seat": "d6",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs090",
+    "name": "Student 2023bcs090",
+    "seat": "e6",
+    "room": "IT1",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs091",
+    "name": "Student 2023bcs091",
+    "seat": "a1",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs092",
+    "name": "Student 2023bcs092",
+    "seat": "b1",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs093",
+    "name": "Student 2023bcs093",
+    "seat": "c1",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs094",
+    "name": "Student 2023bcs094",
+    "seat": "d1",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs095",
+    "name": "Student 2023bcs095",
+    "seat": "e1",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs096",
+    "name": "Student 2023bcs096",
+    "seat": "a2",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs097",
+    "name": "Student 2023bcs097",
+    "seat": "b2",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs098",
+    "name": "Student 2023bcs098",
+    "seat": "c2",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bcs099",
+    "name": "Student 2023bcs099",
+    "seat": "d2",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH100",
+    "name": "Student 2023bCH100",
+    "seat": "e2",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH101",
+    "name": "Student 2023bCH101",
+    "seat": "a3",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH102",
+    "name": "Student 2023bCH102",
+    "seat": "b3",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH103",
+    "name": "Student 2023bCH103",
+    "seat": "c3",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH104",
+    "name": "Student 2023bCH104",
+    "seat": "d3",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH105",
+    "name": "Student 2023bCH105",
+    "seat": "e3",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH106",
+    "name": "Student 2023bCH106",
+    "seat": "a4",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH107",
+    "name": "Student 2023bCH107",
+    "seat": "b4",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH108",
+    "name": "Student 2023bCH108",
+    "seat": "c4",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH109",
+    "name": "Student 2023bCH109",
+    "seat": "d4",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH110",
+    "name": "Student 2023bCH110",
+    "seat": "e4",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH111",
+    "name": "Student 2023bCH111",
+    "seat": "a5",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH112",
+    "name": "Student 2023bCH112",
+    "seat": "b5",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH113",
+    "name": "Student 2023bCH113",
+    "seat": "c5",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH114",
+    "name": "Student 2023bCH114",
+    "seat": "d5",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH115",
+    "name": "Student 2023bCH115",
+    "seat": "e5",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH116",
+    "name": "Student 2023bCH116",
+    "seat": "a6",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH117",
+    "name": "Student 2023bCH117",
+    "seat": "b6",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH118",
+    "name": "Student 2023bCH118",
+    "seat": "c6",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH119",
+    "name": "Student 2023bCH119",
+    "seat": "d6",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bCH120",
+    "name": "Student 2023bCH120",
+    "seat": "e6",
+    "room": "IT2",
+    "location": "IT Dept"
+  },
+  {
+    "regNumber": "2023bit001",
+    "name": "Student 2023bit001",
+    "seat": "a1",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit002",
+    "name": "Student 2023bit002",
+    "seat": "b1",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit003",
+    "name": "Student 2023bit003",
+    "seat": "c1",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit004",
+    "name": "Student 2023bit004",
+    "seat": "d1",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit005",
+    "name": "Student 2023bit005",
+    "seat": "e1",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit006",
+    "name": "Student 2023bit006",
+    "seat": "a2",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit007",
+    "name": "Student 2023bit007",
+    "seat": "b2",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit008",
+    "name": "Student 2023bit008",
+    "seat": "c2",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit009",
+    "name": "Student 2023bit009",
+    "seat": "d2",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit010",
+    "name": "Student 2023bit010",
+    "seat": "e2",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit011",
+    "name": "Student 2023bit011",
+    "seat": "a3",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit012",
+    "name": "Student 2023bit012",
+    "seat": "b3",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit013",
+    "name": "Student 2023bit013",
+    "seat": "c3",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit014",
+    "name": "Student 2023bit014",
+    "seat": "d3",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit015",
+    "name": "Student 2023bit015",
+    "seat": "e3",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit016",
+    "name": "Student 2023bit016",
+    "seat": "a4",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit017",
+    "name": "Student 2023bit017",
+    "seat": "b4",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit018",
+    "name": "Student 2023bit018",
+    "seat": "c4",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit019",
+    "name": "Student 2023bit019",
+    "seat": "d4",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit020",
+    "name": "Student 2023bit020",
+    "seat": "e4",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit021",
+    "name": "Student 2023bit021",
+    "seat": "a5",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit022",
+    "name": "Student 2023bit022",
+    "seat": "b5",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit023",
+    "name": "Student 2023bit023",
+    "seat": "c5",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit024",
+    "name": "Student 2023bit024",
+    "seat": "d5",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit025",
+    "name": "Student 2023bit025",
+    "seat": "e5",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit026",
+    "name": "Student 2023bit026",
+    "seat": "a6",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit027",
+    "name": "Student 2023bit027",
+    "seat": "b6",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit028",
+    "name": "Student 2023bit028",
+    "seat": "c6",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit029",
+    "name": "Student 2023bit029",
+    "seat": "d6",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit030",
+    "name": "Student 2023bit030",
+    "seat": "e6",
+    "room": "AB1",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit031",
+    "name": "Student 2023bit031",
+    "seat": "a1",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit032",
+    "name": "Student 2023bit032",
+    "seat": "b1",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit033",
+    "name": "Student 2023bit033",
+    "seat": "c1",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit034",
+    "name": "Student 2023bit034",
+    "seat": "d1",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit035",
+    "name": "Student 2023bit035",
+    "seat": "e1",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit036",
+    "name": "Student 2023bit036",
+    "seat": "a2",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit037",
+    "name": "Student 2023bit037",
+    "seat": "b2",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit038",
+    "name": "Student 2023bit038",
+    "seat": "c2",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit039",
+    "name": "Student 2023bit039",
+    "seat": "d2",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit040",
+    "name": "Student 2023bit040",
+    "seat": "e2",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit041",
+    "name": "Student 2023bit041",
+    "seat": "a3",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit042",
+    "name": "Student 2023bit042",
+    "seat": "b3",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit043",
+    "name": "Student 2023bit043",
+    "seat": "c3",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit044",
+    "name": "Student 2023bit044",
+    "seat": "d3",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit045",
+    "name": "Student 2023bit045",
+    "seat": "e3",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit046",
+    "name": "Student 2023bit046",
+    "seat": "a4",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit047",
+    "name": "Student 2023bit047",
+    "seat": "b4",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit048",
+    "name": "Student 2023bit048",
+    "seat": "c4",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit049",
+    "name": "Student 2023bit049",
+    "seat": "d4",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit050",
+    "name": "Student 2023bit050",
+    "seat": "e4",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit051",
+    "name": "Student 2023bit051",
+    "seat": "a5",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit052",
+    "name": "Student 2023bit052",
+    "seat": "b5",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit053",
+    "name": "Student 2023bit053",
+    "seat": "c5",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit054",
+    "name": "Student 2023bit054",
+    "seat": "d5",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit055",
+    "name": "Student 2023bit055",
+    "seat": "e5",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit056",
+    "name": "Student 2023bit056",
+    "seat": "a6",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit057",
+    "name": "Student 2023bit057",
+    "seat": "b6",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit058",
+    "name": "Student 2023bit058",
+    "seat": "c6",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit059",
+    "name": "Student 2023bit059",
+    "seat": "d6",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bit060",
+    "name": "Student 2023bit060",
+    "seat": "e6",
+    "room": "AB2",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bch001",
+    "name": "Student 2023bch001",
+    "seat": "a1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch002",
+    "name": "Student 2023bch002",
+    "seat": "b1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch003",
+    "name": "Student 2023bch003",
+    "seat": "c1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch004",
+    "name": "Student 2023bch004",
+    "seat": "d1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch005",
+    "name": "Student 2023bch005",
+    "seat": "e1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch006",
+    "name": "Student 2023bch006",
+    "seat": "a2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch007",
+    "name": "Student 2023bch007",
+    "seat": "b2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch008",
+    "name": "Student 2023bch008",
+    "seat": "c2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch009",
+    "name": "Student 2023bch009",
+    "seat": "d2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch010",
+    "name": "Student 2023bch010",
+    "seat": "e2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch011",
+    "name": "Student 2023bch011",
+    "seat": "a3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch012",
+    "name": "Student 2023bch012",
+    "seat": "b3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch013",
+    "name": "Student 2023bch013",
+    "seat": "c3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch014",
+    "name": "Student 2023bch014",
+    "seat": "d3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch015",
+    "name": "Student 2023bch015",
+    "seat": "e3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch016",
+    "name": "Student 2023bch016",
+    "seat": "a4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch017",
+    "name": "Student 2023bch017",
+    "seat": "b4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch018",
+    "name": "Student 2023bch018",
+    "seat": "c4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch019",
+    "name": "Student 2023bch019",
+    "seat": "d4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch020",
+    "name": "Student 2023bch020",
+    "seat": "e4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch021",
+    "name": "Student 2023bch021",
+    "seat": "a5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch022",
+    "name": "Student 2023bch022",
+    "seat": "b5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch023",
+    "name": "Student 2023bch023",
+    "seat": "c5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch024",
+    "name": "Student 2023bch024",
+    "seat": "d5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch025",
+    "name": "Student 2023bch025",
+    "seat": "e5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch026",
+    "name": "Student 2023bch026",
+    "seat": "a6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch027",
+    "name": "Student 2023bch027",
+    "seat": "b6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch028",
+    "name": "Student 2023bch028",
+    "seat": "c6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch029",
+    "name": "Student 2023bch029",
+    "seat": "d6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bch030",
+    "name": "Student 2023bch030",
+    "seat": "e6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023btt001",
+    "name": "Student 2023btt001",
+    "seat": "a1",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt002",
+    "name": "Student 2023btt002",
+    "seat": "b1",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt003",
+    "name": "Student 2023btt003",
+    "seat": "c1",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt004",
+    "name": "Student 2023btt004",
+    "seat": "d1",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt005",
+    "name": "Student 2023btt005",
+    "seat": "e1",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt006",
+    "name": "Student 2023btt006",
+    "seat": "a2",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt007",
+    "name": "Student 2023btt007",
+    "seat": "b2",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt008",
+    "name": "Student 2023btt008",
+    "seat": "c2",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt009",
+    "name": "Student 2023btt009",
+    "seat": "d2",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt010",
+    "name": "Student 2023btt010",
+    "seat": "e2",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt011",
+    "name": "Student 2023btt011",
+    "seat": "a3",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt012",
+    "name": "Student 2023btt012",
+    "seat": "b3",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt013",
+    "name": "Student 2023btt013",
+    "seat": "c3",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt014",
+    "name": "Student 2023btt014",
+    "seat": "d3",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt015",
+    "name": "Student 2023btt015",
+    "seat": "e3",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt016",
+    "name": "Student 2023btt016",
+    "seat": "a4",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt017",
+    "name": "Student 2023btt017",
+    "seat": "b4",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt018",
+    "name": "Student 2023btt018",
+    "seat": "c4",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt019",
+    "name": "Student 2023btt019",
+    "seat": "d4",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt020",
+    "name": "Student 2023btt020",
+    "seat": "e4",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt021",
+    "name": "Student 2023btt021",
+    "seat": "a5",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt022",
+    "name": "Student 2023btt022",
+    "seat": "b5",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt023",
+    "name": "Student 2023btt023",
+    "seat": "c5",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt024",
+    "name": "Student 2023btt024",
+    "seat": "d5",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt025",
+    "name": "Student 2023btt025",
+    "seat": "e5",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt026",
+    "name": "Student 2023btt026",
+    "seat": "a6",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt027",
+    "name": "Student 2023btt027",
+    "seat": "b6",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt028",
+    "name": "Student 2023btt028",
+    "seat": "c6",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt029",
+    "name": "Student 2023btt029",
+    "seat": "d6",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023btt030",
+    "name": "Student 2023btt030",
+    "seat": "e6",
+    "room": "EC1",
+    "location": "ECE Department"
+  },
+  {
+    "regNumber": "2023bin001",
+    "name": "Student 2023bin001",
+    "seat": "a1",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin002",
+    "name": "Student 2023bin002",
+    "seat": "b1",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin003",
+    "name": "Student 2023bin003",
+    "seat": "c1",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin004",
+    "name": "Student 2023bin004",
+    "seat": "d1",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin005",
+    "name": "Student 2023bin005",
+    "seat": "e1",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin006",
+    "name": "Student 2023bin006",
+    "seat": "a2",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin007",
+    "name": "Student 2023bin007",
+    "seat": "b2",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin008",
+    "name": "Student 2023bin008",
+    "seat": "c2",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin009",
+    "name": "Student 2023bin009",
+    "seat": "d2",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin010",
+    "name": "Student 2023bin010",
+    "seat": "e2",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin011",
+    "name": "Student 2023bin011",
+    "seat": "a3",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin012",
+    "name": "Student 2023bin012",
+    "seat": "b3",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin013",
+    "name": "Student 2023bin013",
+    "seat": "c3",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin014",
+    "name": "Student 2023bin014",
+    "seat": "d3",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin015",
+    "name": "Student 2023bin015",
+    "seat": "e3",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin016",
+    "name": "Student 2023bin016",
+    "seat": "a4",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin017",
+    "name": "Student 2023bin017",
+    "seat": "b4",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin018",
+    "name": "Student 2023bin018",
+    "seat": "c4",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin019",
+    "name": "Student 2023bin019",
+    "seat": "d4",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin020",
+    "name": "Student 2023bin020",
+    "seat": "e4",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin021",
+    "name": "Student 2023bin021",
+    "seat": "a5",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin022",
+    "name": "Student 2023bin022",
+    "seat": "b5",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin023",
+    "name": "Student 2023bin023",
+    "seat": "c5",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin024",
+    "name": "Student 2023bin024",
+    "seat": "d5",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin025",
+    "name": "Student 2023bin025",
+    "seat": "e5",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin026",
+    "name": "Student 2023bin026",
+    "seat": "a6",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin027",
+    "name": "Student 2023bin027",
+    "seat": "b6",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin028",
+    "name": "Student 2023bin028",
+    "seat": "c6",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin029",
+    "name": "Student 2023bin029",
+    "seat": "d6",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin030",
+    "name": "Student 2023bin030",
+    "seat": "e6",
+    "room": "AB3",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin031",
+    "name": "Student 2023bin031",
+    "seat": "a1",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin032",
+    "name": "Student 2023bin032",
+    "seat": "b1",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin033",
+    "name": "Student 2023bin033",
+    "seat": "c1",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin034",
+    "name": "Student 2023bin034",
+    "seat": "d1",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin035",
+    "name": "Student 2023bin035",
+    "seat": "e1",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin036",
+    "name": "Student 2023bin036",
+    "seat": "a2",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin037",
+    "name": "Student 2023bin037",
+    "seat": "b2",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin038",
+    "name": "Student 2023bin038",
+    "seat": "c2",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin039",
+    "name": "Student 2023bin039",
+    "seat": "d2",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bin040",
+    "name": "Student 2023bin040",
+    "seat": "e2",
+    "room": "AB4",
+    "location": "Admin Building"
+  },
+  {
+    "regNumber": "2023bec001",
+    "name": "Student 2023bec001",
+    "seat": "a1",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec002",
+    "name": "Student 2023bec002",
+    "seat": "b1",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec003",
+    "name": "Student 2023bec003",
+    "seat": "c1",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec004",
+    "name": "Student 2023bec004",
+    "seat": "d1",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec005",
+    "name": "Student 2023bec005",
+    "seat": "e1",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec006",
+    "name": "Student 2023bec006",
+    "seat": "a2",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec007",
+    "name": "Student 2023bec007",
+    "seat": "b2",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec008",
+    "name": "Student 2023bec008",
+    "seat": "c2",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec009",
+    "name": "Student 2023bec009",
+    "seat": "d2",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec010",
+    "name": "Student 2023bec010",
+    "seat": "e2",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec011",
+    "name": "Student 2023bec011",
+    "seat": "a3",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec012",
+    "name": "Student 2023bec012",
+    "seat": "b3",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec013",
+    "name": "Student 2023bec013",
+    "seat": "c3",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec014",
+    "name": "Student 2023bec014",
+    "seat": "d3",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec015",
+    "name": "Student 2023bec015",
+    "seat": "e3",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec016",
+    "name": "Student 2023bec016",
+    "seat": "a4",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec017",
+    "name": "Student 2023bec017",
+    "seat": "b4",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec018",
+    "name": "Student 2023bec018",
+    "seat": "c4",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec019",
+    "name": "Student 2023bec019",
+    "seat": "d4",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec020",
+    "name": "Student 2023bec020",
+    "seat": "e4",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec021",
+    "name": "Student 2023bec021",
+    "seat": "a5",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec022",
+    "name": "Student 2023bec022",
+    "seat": "b5",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec023",
+    "name": "Student 2023bec023",
+    "seat": "c5",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec024",
+    "name": "Student 2023bec024",
+    "seat": "d5",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec025",
+    "name": "Student 2023bec025",
+    "seat": "e5",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec026",
+    "name": "Student 2023bec026",
+    "seat": "a6",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec027",
+    "name": "Student 2023bec027",
+    "seat": "b6",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec028",
+    "name": "Student 2023bec028",
+    "seat": "c6",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec029",
+    "name": "Student 2023bec029",
+    "seat": "d6",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec030",
+    "name": "Student 2023bec030",
+    "seat": "e6",
+    "room": "TT1",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec031",
+    "name": "Student 2023bec031",
+    "seat": "a1",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec032",
+    "name": "Student 2023bec032",
+    "seat": "b1",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec033",
+    "name": "Student 2023bec033",
+    "seat": "c1",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec034",
+    "name": "Student 2023bec034",
+    "seat": "d1",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec035",
+    "name": "Student 2023bec035",
+    "seat": "e1",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec036",
+    "name": "Student 2023bec036",
+    "seat": "a2",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec037",
+    "name": "Student 2023bec037",
+    "seat": "b2",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec038",
+    "name": "Student 2023bec038",
+    "seat": "c2",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec039",
+    "name": "Student 2023bec039",
+    "seat": "d2",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec040",
+    "name": "Student 2023bec040",
+    "seat": "e2",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec041",
+    "name": "Student 2023bec041",
+    "seat": "a3",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec042",
+    "name": "Student 2023bec042",
+    "seat": "b3",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec043",
+    "name": "Student 2023bec043",
+    "seat": "c3",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec044",
+    "name": "Student 2023bec044",
+    "seat": "d3",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec045",
+    "name": "Student 2023bec045",
+    "seat": "e3",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec046",
+    "name": "Student 2023bec046",
+    "seat": "a4",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec047",
+    "name": "Student 2023bec047",
+    "seat": "b4",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec048",
+    "name": "Student 2023bec048",
+    "seat": "c4",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec049",
+    "name": "Student 2023bec049",
+    "seat": "d4",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec050",
+    "name": "Student 2023bec050",
+    "seat": "e4",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec051",
+    "name": "Student 2023bec051",
+    "seat": "a5",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec052",
+    "name": "Student 2023bec052",
+    "seat": "b5",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec053",
+    "name": "Student 2023bec053",
+    "seat": "c5",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec054",
+    "name": "Student 2023bec054",
+    "seat": "d5",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec055",
+    "name": "Student 2023bec055",
+    "seat": "e5",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec056",
+    "name": "Student 2023bec056",
+    "seat": "a6",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec057",
+    "name": "Student 2023bec057",
+    "seat": "b6",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec058",
+    "name": "Student 2023bec058",
+    "seat": "c6",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec059",
+    "name": "Student 2023bec059",
+    "seat": "d6",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec060",
+    "name": "Student 2023bec060",
+    "seat": "e6",
+    "room": "TT2",
+    "location": "Textile Dept"
+  },
+  {
+    "regNumber": "2023bec061",
+    "name": "Student 2023bec061",
+    "seat": "a1",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec062",
+    "name": "Student 2023bec062",
+    "seat": "b1",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec063",
+    "name": "Student 2023bec063",
+    "seat": "c1",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec064",
+    "name": "Student 2023bec064",
+    "seat": "d1",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec065",
+    "name": "Student 2023bec065",
+    "seat": "e1",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec066",
+    "name": "Student 2023bec066",
+    "seat": "a2",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec067",
+    "name": "Student 2023bec067",
+    "seat": "b2",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec068",
+    "name": "Student 2023bec068",
+    "seat": "c2",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec069",
+    "name": "Student 2023bec069",
+    "seat": "d2",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec070",
+    "name": "Student 2023bec070",
+    "seat": "e2",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec071",
+    "name": "Student 2023bec071",
+    "seat": "a3",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec072",
+    "name": "Student 2023bec072",
+    "seat": "b3",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec073",
+    "name": "Student 2023bec073",
+    "seat": "c3",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec074",
+    "name": "Student 2023bec074",
+    "seat": "d3",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec075",
+    "name": "Student 2023bec075",
+    "seat": "e3",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec076",
+    "name": "Student 2023bec076",
+    "seat": "a4",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec077",
+    "name": "Student 2023bec077",
+    "seat": "b4",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec078",
+    "name": "Student 2023bec078",
+    "seat": "c4",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec079",
+    "name": "Student 2023bec079",
+    "seat": "d4",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec080",
+    "name": "Student 2023bec080",
+    "seat": "e4",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec081",
+    "name": "Student 2023bec081",
+    "seat": "a5",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec082",
+    "name": "Student 2023bec082",
+    "seat": "b5",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec083",
+    "name": "Student 2023bec083",
+    "seat": "c5",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec084",
+    "name": "Student 2023bec084",
+    "seat": "d5",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec085",
+    "name": "Student 2023bec085",
+    "seat": "e5",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec086",
+    "name": "Student 2023bec086",
+    "seat": "a6",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec087",
+    "name": "Student 2023bec087",
+    "seat": "b6",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec088",
+    "name": "Student 2023bec088",
+    "seat": "c6",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec089",
+    "name": "Student 2023bec089",
+    "seat": "d6",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec090",
+    "name": "Student 2023bec090",
+    "seat": "e6",
+    "room": "EX1",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec091",
+    "name": "Student 2023bec091",
+    "seat": "a1",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec092",
+    "name": "Student 2023bec092",
+    "seat": "b1",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec093",
+    "name": "Student 2023bec093",
+    "seat": "c1",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec094",
+    "name": "Student 2023bec094",
+    "seat": "d1",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec095",
+    "name": "Student 2023bec095",
+    "seat": "e1",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec096",
+    "name": "Student 2023bec096",
+    "seat": "a2",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec097",
+    "name": "Student 2023bec097",
+    "seat": "b2",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec098",
+    "name": "Student 2023bec098",
+    "seat": "c2",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec099",
+    "name": "Student 2023bec099",
+    "seat": "d2",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec100",
+    "name": "Student 2023bec100",
+    "seat": "e2",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec101",
+    "name": "Student 2023bec101",
+    "seat": "a3",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec102",
+    "name": "Student 2023bec102",
+    "seat": "b3",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec103",
+    "name": "Student 2023bec103",
+    "seat": "c3",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec104",
+    "name": "Student 2023bec104",
+    "seat": "d3",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec105",
+    "name": "Student 2023bec105",
+    "seat": "e3",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec106",
+    "name": "Student 2023bec106",
+    "seat": "a4",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec107",
+    "name": "Student 2023bec107",
+    "seat": "b4",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec108",
+    "name": "Student 2023bec108",
+    "seat": "c4",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec109",
+    "name": "Student 2023bec109",
+    "seat": "d4",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec110",
+    "name": "Student 2023bec110",
+    "seat": "e4",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec111",
+    "name": "Student 2023bec111",
+    "seat": "a5",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec112",
+    "name": "Student 2023bec112",
+    "seat": "b5",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec113",
+    "name": "Student 2023bec113",
+    "seat": "c5",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec114",
+    "name": "Student 2023bec114",
+    "seat": "d5",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec115",
+    "name": "Student 2023bec115",
+    "seat": "e5",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec116",
+    "name": "Student 2023bec116",
+    "seat": "a6",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec117",
+    "name": "Student 2023bec117",
+    "seat": "b6",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec118",
+    "name": "Student 2023bec118",
+    "seat": "c6",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec119",
+    "name": "Student 2023bec119",
+    "seat": "d6",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bec120",
+    "name": "Student 2023bec120",
+    "seat": "e6",
+    "room": "EX2",
+    "location": "EXT Department"
+  },
+  {
+    "regNumber": "2023bpr001",
+    "name": "Student 2023bpr001",
+    "seat": "a1",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr002",
+    "name": "Student 2023bpr002",
+    "seat": "b1",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr003",
+    "name": "Student 2023bpr003",
+    "seat": "c1",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr004",
+    "name": "Student 2023bpr004",
+    "seat": "d1",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr005",
+    "name": "Student 2023bpr005",
+    "seat": "e1",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr006",
+    "name": "Student 2023bpr006",
+    "seat": "a2",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr007",
+    "name": "Student 2023bpr007",
+    "seat": "b2",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr008",
+    "name": "Student 2023bpr008",
+    "seat": "c2",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr009",
+    "name": "Student 2023bpr009",
+    "seat": "d2",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr010",
+    "name": "Student 2023bpr010",
+    "seat": "e2",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr011",
+    "name": "Student 2023bpr011",
+    "seat": "a3",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr012",
+    "name": "Student 2023bpr012",
+    "seat": "b3",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr013",
+    "name": "Student 2023bpr013",
+    "seat": "c3",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr014",
+    "name": "Student 2023bpr014",
+    "seat": "d3",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr015",
+    "name": "Student 2023bpr015",
+    "seat": "e3",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr016",
+    "name": "Student 2023bpr016",
+    "seat": "a4",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr017",
+    "name": "Student 2023bpr017",
+    "seat": "b4",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr018",
+    "name": "Student 2023bpr018",
+    "seat": "c4",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr019",
+    "name": "Student 2023bpr019",
+    "seat": "d4",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr020",
+    "name": "Student 2023bpr020",
+    "seat": "e4",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr021",
+    "name": "Student 2023bpr021",
+    "seat": "a5",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr022",
+    "name": "Student 2023bpr022",
+    "seat": "b5",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr023",
+    "name": "Student 2023bpr023",
+    "seat": "c5",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr024",
+    "name": "Student 2023bpr024",
+    "seat": "d5",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr025",
+    "name": "Student 2023bpr025",
+    "seat": "e5",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr026",
+    "name": "Student 2023bpr026",
+    "seat": "a6",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr027",
+    "name": "Student 2023bpr027",
+    "seat": "b6",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr028",
+    "name": "Student 2023bpr028",
+    "seat": "c6",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr029",
+    "name": "Student 2023bpr029",
+    "seat": "d6",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr030",
+    "name": "Student 2023bpr030",
+    "seat": "e6",
+    "room": "ME1",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr031",
+    "name": "Student 2023bpr031",
+    "seat": "a1",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr032",
+    "name": "Student 2023bpr032",
+    "seat": "b1",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr033",
+    "name": "Student 2023bpr033",
+    "seat": "c1",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr034",
+    "name": "Student 2023bpr034",
+    "seat": "d1",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr035",
+    "name": "Student 2023bpr035",
+    "seat": "e1",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr036",
+    "name": "Student 2023bpr036",
+    "seat": "a2",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr037",
+    "name": "Student 2023bpr037",
+    "seat": "b2",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr038",
+    "name": "Student 2023bpr038",
+    "seat": "c2",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr039",
+    "name": "Student 2023bpr039",
+    "seat": "d2",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr040",
+    "name": "Student 2023bpr040",
+    "seat": "e2",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr041",
+    "name": "Student 2023bpr041",
+    "seat": "a3",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr042",
+    "name": "Student 2023bpr042",
+    "seat": "b3",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr043",
+    "name": "Student 2023bpr043",
+    "seat": "c3",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr044",
+    "name": "Student 2023bpr044",
+    "seat": "d3",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr045",
+    "name": "Student 2023bpr045",
+    "seat": "e3",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr046",
+    "name": "Student 2023bpr046",
+    "seat": "a4",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr047",
+    "name": "Student 2023bpr047",
+    "seat": "b4",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr048",
+    "name": "Student 2023bpr048",
+    "seat": "c4",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr049",
+    "name": "Student 2023bpr049",
+    "seat": "d4",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr050",
+    "name": "Student 2023bpr050",
+    "seat": "e4",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr051",
+    "name": "Student 2023bpr051",
+    "seat": "a5",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr052",
+    "name": "Student 2023bpr052",
+    "seat": "b5",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr053",
+    "name": "Student 2023bpr053",
+    "seat": "c5",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr054",
+    "name": "Student 2023bpr054",
+    "seat": "d5",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr055",
+    "name": "Student 2023bpr055",
+    "seat": "e5",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr056",
+    "name": "Student 2023bpr056",
+    "seat": "a6",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr057",
+    "name": "Student 2023bpr057",
+    "seat": "b6",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr058",
+    "name": "Student 2023bpr058",
+    "seat": "c6",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr059",
+    "name": "Student 2023bpr059",
+    "seat": "d6",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bpr060",
+    "name": "Student 2023bpr060",
+    "seat": "e6",
+    "room": "ME2",
+    "location": "Mech Department"
+  },
+  {
+    "regNumber": "2023bme001",
+    "name": "Student 2023bme001",
+    "seat": "a1",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme002",
+    "name": "Student 2023bme002",
+    "seat": "b1",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme003",
+    "name": "Student 2023bme003",
+    "seat": "c1",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme004",
+    "name": "Student 2023bme004",
+    "seat": "d1",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme005",
+    "name": "Student 2023bme005",
+    "seat": "e1",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme006",
+    "name": "Student 2023bme006",
+    "seat": "a2",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme007",
+    "name": "Student 2023bme007",
+    "seat": "b2",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme008",
+    "name": "Student 2023bme008",
+    "seat": "c2",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme009",
+    "name": "Student 2023bme009",
+    "seat": "d2",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme010",
+    "name": "Student 2023bme010",
+    "seat": "e2",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme011",
+    "name": "Student 2023bme011",
+    "seat": "a3",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme012",
+    "name": "Student 2023bme012",
+    "seat": "b3",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme013",
+    "name": "Student 2023bme013",
+    "seat": "c3",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme014",
+    "name": "Student 2023bme014",
+    "seat": "d3",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme015",
+    "name": "Student 2023bme015",
+    "seat": "e3",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme016",
+    "name": "Student 2023bme016",
+    "seat": "a4",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme017",
+    "name": "Student 2023bme017",
+    "seat": "b4",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme018",
+    "name": "Student 2023bme018",
+    "seat": "c4",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme019",
+    "name": "Student 2023bme019",
+    "seat": "d4",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme020",
+    "name": "Student 2023bme020",
+    "seat": "e4",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme021",
+    "name": "Student 2023bme021",
+    "seat": "a5",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme022",
+    "name": "Student 2023bme022",
+    "seat": "b5",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme023",
+    "name": "Student 2023bme023",
+    "seat": "c5",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme024",
+    "name": "Student 2023bme024",
+    "seat": "d5",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme025",
+    "name": "Student 2023bme025",
+    "seat": "e5",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme026",
+    "name": "Student 2023bme026",
+    "seat": "a6",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme027",
+    "name": "Student 2023bme027",
+    "seat": "b6",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme028",
+    "name": "Student 2023bme028",
+    "seat": "c6",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme029",
+    "name": "Student 2023bme029",
+    "seat": "d6",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme030",
+    "name": "Student 2023bme030",
+    "seat": "e6",
+    "room": "PR1",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme031",
+    "name": "Student 2023bme031",
+    "seat": "a1",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme032",
+    "name": "Student 2023bme032",
+    "seat": "b1",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme033",
+    "name": "Student 2023bme033",
+    "seat": "c1",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme034",
+    "name": "Student 2023bme034",
+    "seat": "d1",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme035",
+    "name": "Student 2023bme035",
+    "seat": "e1",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme036",
+    "name": "Student 2023bme036",
+    "seat": "a2",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme037",
+    "name": "Student 2023bme037",
+    "seat": "b2",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme038",
+    "name": "Student 2023bme038",
+    "seat": "c2",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme039",
+    "name": "Student 2023bme039",
+    "seat": "d2",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme040",
+    "name": "Student 2023bme040",
+    "seat": "e2",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme041",
+    "name": "Student 2023bme041",
+    "seat": "a3",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme042",
+    "name": "Student 2023bme042",
+    "seat": "b3",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme043",
+    "name": "Student 2023bme043",
+    "seat": "c3",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme044",
+    "name": "Student 2023bme044",
+    "seat": "d3",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme045",
+    "name": "Student 2023bme045",
+    "seat": "e3",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme046",
+    "name": "Student 2023bme046",
+    "seat": "a4",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme047",
+    "name": "Student 2023bme047",
+    "seat": "b4",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme048",
+    "name": "Student 2023bme048",
+    "seat": "c4",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme049",
+    "name": "Student 2023bme049",
+    "seat": "d4",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme050",
+    "name": "Student 2023bme050",
+    "seat": "e4",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme051",
+    "name": "Student 2023bme051",
+    "seat": "a5",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme052",
+    "name": "Student 2023bme052",
+    "seat": "b5",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme053",
+    "name": "Student 2023bme053",
+    "seat": "c5",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme054",
+    "name": "Student 2023bme054",
+    "seat": "d5",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme055",
+    "name": "Student 2023bme055",
+    "seat": "e5",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme056",
+    "name": "Student 2023bme056",
+    "seat": "a6",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme057",
+    "name": "Student 2023bme057",
+    "seat": "b6",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme058",
+    "name": "Student 2023bme058",
+    "seat": "c6",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme059",
+    "name": "Student 2023bme059",
+    "seat": "d6",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bme060",
+    "name": "Student 2023bme060",
+    "seat": "e6",
+    "room": "PR2",
+    "location": "Production Dept"
+  },
+  {
+    "regNumber": "2023bel001",
+    "name": "Student 2023bel001",
+    "seat": "a1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel002",
+    "name": "Student 2023bel002",
+    "seat": "b1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel003",
+    "name": "Student 2023bel003",
+    "seat": "c1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel004",
+    "name": "Student 2023bel004",
+    "seat": "d1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel005",
+    "name": "Student 2023bel005",
+    "seat": "e1",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel006",
+    "name": "Student 2023bel006",
+    "seat": "a2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel007",
+    "name": "Student 2023bel007",
+    "seat": "b2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel008",
+    "name": "Student 2023bel008",
+    "seat": "c2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel009",
+    "name": "Student 2023bel009",
+    "seat": "d2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel010",
+    "name": "Student 2023bel010",
+    "seat": "e2",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel011",
+    "name": "Student 2023bel011",
+    "seat": "a3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel012",
+    "name": "Student 2023bel012",
+    "seat": "b3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel013",
+    "name": "Student 2023bel013",
+    "seat": "c3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel014",
+    "name": "Student 2023bel014",
+    "seat": "d3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel015",
+    "name": "Student 2023bel015",
+    "seat": "e3",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel016",
+    "name": "Student 2023bel016",
+    "seat": "a4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel017",
+    "name": "Student 2023bel017",
+    "seat": "b4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel018",
+    "name": "Student 2023bel018",
+    "seat": "c4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel019",
+    "name": "Student 2023bel019",
+    "seat": "d4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel020",
+    "name": "Student 2023bel020",
+    "seat": "e4",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel021",
+    "name": "Student 2023bel021",
+    "seat": "a5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel022",
+    "name": "Student 2023bel022",
+    "seat": "b5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel023",
+    "name": "Student 2023bel023",
+    "seat": "c5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel024",
+    "name": "Student 2023bel024",
+    "seat": "d5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel025",
+    "name": "Student 2023bel025",
+    "seat": "e5",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel026",
+    "name": "Student 2023bel026",
+    "seat": "a6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel027",
+    "name": "Student 2023bel027",
+    "seat": "b6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel028",
+    "name": "Student 2023bel028",
+    "seat": "c6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel029",
+    "name": "Student 2023bel029",
+    "seat": "d6",
+    "room": "CS1",
+    "location": "CSE Department"
+  },
+  {
+    "regNumber": "2023bel030",
+    "name": "Student 2023bel030",
+    "seat": "e6",
+    "room": "CS1",
+    "location": "CSE Department"
+  }
+];
+
+
+        function findSeating() {
+    const regNumber = document.getElementById('regNumber').value.trim().toLowerCase();
+    const errorDiv = document.getElementById('error');
+    const resultBox = document.getElementById('resultBox');
+    
+    // Clear previous error messages
+    errorDiv.textContent = '';
+    
+    if (!regNumber) {
+        errorDiv.textContent = 'Please enter a registration number.';
+        resultBox.style.display = 'none';
+        return;
+    }
+    
+    const student = studentData.find(s => s.regNumber.toLowerCase() === regNumber);
+    
+    if (!student) {
+        errorDiv.textContent = 'Student not found. Please check the registration number.';
+        resultBox.style.display = 'none';
+        return;
+    }
+
+    resultBox.style.display = 'block';
+    document.getElementById('studentInfo').innerHTML = `
+        <h2>Student Information</h2>
+        <p><strong>Registration Number:</strong> ${student.regNumber}</p>
+        <p><strong>Name:</strong> ${student.name}</p>
+        <p><strong>Room Number:</strong> ${student.room}</p>
+        <p><strong>Seat Number:</strong> ${student.seat}</p>
+    `;
+    
+    const roomStudents = studentData.filter(s => s.room === student.room);
+    document.getElementById('roomInfo').innerHTML = `
+        <h2>Room Information</h2>
+        <p><strong>Room Number:</strong> ${student.room}</p>
+        <p><strong>Location:</strong> ${student.location}</p>
+        <p><strong>Total Capacity:</strong> ${roomStudents.length} students</p>
+    `;
+    
+    const seatGrid = document.getElementById('seatGrid');
+    seatGrid.innerHTML = '';
+
+    const roomLayouts = {
+    "CH1": { rows: 6, cols: 5}, // 30 seats
+    "CH2": { rows: 6, cols: 5}, // 30 seats
+    "IT1": { rows: 6, cols: 5}, // 30 seats
+    "IT2": { rows: 6, cols: 5}, // 30 seats
+    "AB1": { rows: 6, cols: 5}, // 30 seats
+    "AB2": { rows: 6, cols: 5}, // 30 seats
+    "CS1": { rows: 6, cols: 5}, // 30 seats (appears twice in data for different batches, total 50)
+    "EC1": { rows: 6, cols: 5}, // 30 seats
+    "AB3": { rows: 6, cols: 5}, // 30 seats
+    "AB4": { rows: 2, cols: 5}, // 10 seats
+    "TT1": { rows: 6, cols: 5}, // 30 seats
+    "TT2": { rows: 6, cols: 5}, // 30 seats
+    "EX1": { rows: 6, cols: 5}, // 30 seats
+    "EX2": { rows: 6, cols: 5}, // 30 seats
+    "ME1": { rows: 6, cols: 5}, // 30 seats    "ME2": { rows: 5, cols: 5}, // 30 seats
+    "PR1": { rows: 6, cols: 5}, // 30 seats
+    "PR2": { rows: 6, cols: 5}, // 30 seats
+    };
+
+    const layout = roomLayouts[student.room] || { rows: 6, cols: 5 };
+    const rows = 6;
+const cols = 5;
+const seatMap = {};
+roomStudents.forEach(s => {
+    seatMap[s.seat] = s;
+});
+
+// ✅ Loop by columns first, then rows to make:
+// a1 a2 a3 ...
+// b1 b2 b3 ...
+for (let col = 0; col < cols; col++) {
+    for (let row = 1; row <= rows; row++) {
+        const colLetter = String.fromCharCode(97 + col);
+        const seatId = `${colLetter}${row}`;
+
+        const seatDiv = document.createElement('div');
+        seatDiv.className = 'seat';
+
+        if (seatMap[seatId]) {
+            const seatStudent = seatMap[seatId];
+            seatDiv.textContent = `${seatId}: ${seatStudent.regNumber}`;
+            if (seatStudent.regNumber.toLowerCase() === student.regNumber.toLowerCase()) {
+                seatDiv.classList.add('highlighted');
+            }
+        } else {
+            seatDiv.textContent = `${seatId}: Empty`;
+            seatDiv.style.opacity = '0.7';
+        }
+
+        seatGrid.appendChild(seatDiv);
+    }
+}
+
+}
+
+
+        // Add event listener for 'Enter' key on the input field
+        document.getElementById('regNumber').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                findSeating();
+            }
+        });
+    </script>
+</body>
+</html>
