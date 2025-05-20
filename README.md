@@ -1,30 +1,28 @@
-Exam Seating Arrangement System 🎓
+# Exam Seating Arrangement System 🎓
+
 This project is a Java Spring Boot application designed to automate and manage exam seating arrangements efficiently across multiple departments and rooms. It features a responsive web interface using HTML, CSS, and JavaScript, and uses MySQL as the backend database.
 
-Key Features:
-Role-based login for Admin, Faculty, and Students (without Spring Security)
+# Key Features:
 
-Admin dashboard for managing students, rooms, departments, and seat allocations
+* Role-based login for Admin, Faculty, and Students (without Spring Security)
 
-Faculty panel for viewing allocations, marking attendance, and printing seating charts
+* Admin dashboard for managing students, rooms, departments, and seat allocations
 
-Student portal to check assigned seat and room using registration number
+* Faculty panel for viewing allocations, marking attendance, and printing seating charts
 
-PDF seat slip download with optional QR code
+* Student portal to check assigned seat and room using registration number
 
-Visual seat layout with seat highlighting
+* QR code
 
-Excel upload for bulk data import
+* Visual seat layout with seat highlighting
 
-Mobile-friendly, clean UI
+* Excel upload for bulk data import
 
-Tech Stack:
-Java, Spring Boot
 
-MySQL
-
-HTML, CSS, JavaScript
-
-REST API
+# Tech Stack:
+* Java, Spring Boot
+* MySQL
+* HTML, CSS, JavaScript
+* REST API
 
 This system ensures fair seating, easy monitoring, and effective exam room management. Ideal for institutions seeking an automated and user-friendly exam seating solution.
